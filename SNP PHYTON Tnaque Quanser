@@ -1,0 +1,79 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+from scipy.integrate import odeint
+
+# PARAMETROS
+
+g = 9.81
+D = 1
+D0 = 0.1
+
+# AREAS
+
+A = np.pi * D**2 / 4
+a = np.pi * D0**2 / 4
+
+# VOLTAJES
+
+voltajes = [3, 6, 9, 12]
+
+# TABLA
+
+tabla = []
+
+plt.figure()
+
+for u0 in voltajes:
+
+    # FLUJO
+
+    qin = 0.001 * u0
+
+    # ECUACION DIFERENCIAL
+
+    def tanque(h, t):
+
+        dhdt = (qin/A) - (a/A) * np.sqrt(2 * g * h)
+
+        return dhdt
+
+    # TIEMPO
+
+    t = np.linspace(0, 100, 300)
+
+    # CONDICION INICIAL
+
+    h_inicial = 0
+
+    # SOLUCION NUMERICA
+
+    h = odeint(tanque, h_inicial, t)
+
+    # ALTURA FINAL
+
+    h0 = h[-1][0]
+
+    # GRAFICA CON PUNTOS
+
+    plt.plot(t, h, marker='o', markevery=20, label=f'{u0} V')
+
+    # GUARDAR TABLA
+
+    tabla.append([u0, round(h0, 4)])
+
+# CONFIGURACION
+
+plt.xlabel("Tiempo (s)")
+plt.ylabel("Altura h(t)")
+plt.title("SNP - Tanque Quanser")
+plt.legend()
+plt.grid()
+
+plt.show()
+
+# MOSTRAR TABLA
+
+df = pd.DataFrame(tabla, columns=["Voltaje (V)", "Altura Equilibrio (m)"])
+
+print(df)
