@@ -1,0 +1,50 @@
+import numpy as np
+import pandas as pd
+
+# PARAMETROS DEL CIRCUITO RLC
+
+R = 10000          # 10 kΩ
+L = 0.1            # 100 mH
+C = 100e-9         # 100 nF
+
+# VOLTAJE DE ENTRADA
+
+Vi = 1
+
+# FRECUENCIAS
+
+frecuencias = [10, 159, 1000]
+
+# TABLA
+
+tabla = []
+
+for f in frecuencias:
+
+    # FRECUENCIA ANGULAR
+
+    w = 2 * np.pi * f
+
+    # FUNCION TRANSFERENCIA RLC
+    # |H(jw)|
+
+    H = 1 / np.sqrt((1 - (w**2)*L*C)**2 + (w*R*C)**2)
+
+    # VOLTAJE DE SALIDA
+
+    Vo = Vi * H
+
+    # GUARDAR DATOS
+
+    tabla.append([f, Vi, round(Vo, 4)])
+
+# CREAR TABLA
+
+df = pd.DataFrame(tabla,
+                  columns=["Frecuencia (Hz)",
+                           "Vi (V)",
+                           "Vo SA (V)"])
+
+# MOSTRAR TABLA
+
+print(df)
