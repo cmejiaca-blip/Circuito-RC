@@ -1,0 +1,81 @@
+import numpy as np
+import pandas as pd
+from scipy.integrate import odeint
+
+# PARAMETROS DEL CIRCUITO RLC
+
+R = 10000          # 10 kΩ
+L = 0.1            # 100 mH
+C = 100e-9         # 100 nF
+
+# VOLTAJE DE ENTRADA
+
+Vi = 1
+
+# FRECUENCIAS
+
+frecuencias = [10, 159, 1000]
+
+# TABLA
+
+tabla = []
+
+# ECUACION DIFERENCIAL DEL RLC
+
+for f in frecuencias:
+
+    # ENTRADA SENOIDAL
+
+    def vin(t):
+
+        return Vi * np.sin(2*np.pi*f*t)
+
+    # MODELO RLC
+
+    def rlc(x, t):
+
+        i = x[0]
+        di = x[1]
+
+        d2i = (vin(t) - R*di - (1/C)*i) / L
+
+        return [di, d2i]
+
+    # CONDICIONES INICIALES
+
+    x0 = [0, 0]
+
+    # TIEMPO
+
+    t = np.linspace(0, 1, 5000)
+
+    # SOLUCION NUMERICA
+
+    x = odeint(rlc, x0, t)
+
+    # CORRIENTE
+
+    i = x[:,0]
+
+    # VOLTAJE EN EL CAPACITOR
+
+    Vc = i / C
+
+    # AMPLITUD APROXIMADA
+
+    Vo = (np.max(Vc) - np.min(Vc)) / 2
+
+    # GUARDAR TABLA
+
+    tabla.append([f, Vi, round(Vo, 4)])
+
+# CREAR TABLA
+
+df = pd.DataFrame(tabla,
+                  columns=["Frecuencia (Hz)",
+                           "Vi (V)",
+                           "Vo SNP (V)"])
+
+# MOSTRAR TABLA
+
+print(df)
