@@ -1,0 +1,33 @@
+import numpy as np
+from scipy.integrate import odeint
+
+R = 10e3
+C = 100e-9
+RC = R * C
+
+Vp = 1
+
+frecuencias = [10, 159, 1000]
+
+print("SOLUCION NUMERICA PYTHON")
+print("----------------------------")
+print(" Frecuencia | Vout")
+
+for f in frecuencias:
+
+    w = 2 * np.pi * f
+
+    t = np.linspace(0, 1, 10000)
+
+    def circuito(vc, t):
+        vin = Vp * np.sin(w * t)
+        dvcdt = (vin - vc) / RC
+        return dvcdt
+
+    vc0 = 0
+
+    vc = odeint(circuito, vc0, t)
+
+    amplitud = (np.max(vc) - np.min(vc)) / 2
+
+    print(f"{f:8} Hz | {float(amplitud):.3f} V")
